@@ -34,12 +34,47 @@ app.post('/login', async (req, res) => {
         });
 
         if (response.data.success) {
-            res.render('success.html', { message: response.data.message });
+            res.redirect('/tasks');
         } else {
             res.render('login.html', { error: 'Invalid credentials, try again.' });
         }
     } catch (error) {
         res.render('login.html', { error: 'Invalid credentials, try again.' });
+    }
+});
+
+// Obtener todas las tareas
+app.get('/tasks', async (req, res) => {
+    try {
+        const response = await axios.get('http://localhost:3000/tasks');
+        res.render('index.html', { tasks: response.data });
+    } catch (error) {
+        res.status(500).send('Error al obtener las tareas');
+    }
+});
+
+// Crear una nueva tarea
+app.post('/tasks', async (req, res) => {
+    try {
+        const task = { title: req.body.title };
+        await axios.post('http://localhost:3000/tasks/create', task);
+        res.redirect('/tasks');
+    } catch (error) {
+        res.status(500).send('Error al crear la tarea');
+    }
+});
+
+// Actualizar tarea (completar/incompletar)
+app.post('/tasks/:id/toggle', async (req, res) => {
+    try {
+        const taskId = req.params.id;
+        const task = await axios.get(`http://localhost:3000/tasks/${taskId}`);
+        await axios.post(`http://localhost:3000/tasks/update/${taskId}`, {
+            completed: !task.data[0].completed
+        });
+        res.redirect('/tasks');
+    } catch (error) {
+        res.status(500).send('Error al actualizar la tarea');
     }
 });
 

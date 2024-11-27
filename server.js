@@ -6,6 +6,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import ejs from 'ejs'; // Importa ejs correctamente
 
+var session_id = 0;
+
 // Obtener el directorio del archivo actual (equivalente a __dirname en CommonJS)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,6 +36,7 @@ app.post('/login', async (req, res) => {
         });
 
         if (response.data.success) {
+            session_id = response.data.user_id;
             res.redirect('/tasks');
         } else {
             res.render('login.html', { error: 'Invalid credentials, try again.' });
@@ -56,7 +59,8 @@ app.get('/tasks', async (req, res) => {
 // Crear una nueva tarea
 app.post('/tasks', async (req, res) => {
     try {
-        const task = { title: req.body.title };
+        const task = { user_id: session_id, title: req.body.title };
+        console.log(task);
         await axios.post('http://localhost:3000/tasks/create', task);
         res.redirect('/tasks');
     } catch (error) {
@@ -75,6 +79,17 @@ app.post('/tasks/:id/toggle', async (req, res) => {
         res.redirect('/tasks');
     } catch (error) {
         res.status(500).send('Error al actualizar la tarea');
+    }
+});
+
+// Borrar tarea 
+app.post('/tasks/:id/delete', async (req, res) => {
+    try {
+        const taskId = req.params.id;
+        const task = await axios.post(`http://localhost:3000/tasks/delete/${taskId}`);
+        res.redirect('/tasks');
+    } catch (error) {
+        res.status(500).send('Error al borrar la tarea');
     }
 });
 

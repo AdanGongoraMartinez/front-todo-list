@@ -17,9 +17,14 @@
             <% tasks.forEach(task => { %>
                 <li class="<%= task.completed ? 'completed' : '' %>">
                     <form action="/tasks/<%= task.id %>/toggle" method="POST">
-                        <span><%= task.title %></span>
-                        <button type="submit">
+                        <button type="submit" class="mark">
                             <%= task.completed ? 'Desmarcar' : 'Completar' %>
+                        </button>
+                        <span><%= task.title %></span>
+                    </form>
+                    <form action="/tasks/<%= task.id %>/delete" method="POST">
+                        <button type="submit" class="delete">
+                            Borrar
                         </button>
                     </form>
                 </li>

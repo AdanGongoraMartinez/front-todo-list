@@ -6,6 +6,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import ejs from 'ejs'; // Importa ejs correctamente
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.API_URL;
+
 var session_id = 0;
 
 // Obtener el directorio del archivo actual (equivalente a __dirname en CommonJS)
@@ -30,7 +34,7 @@ app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const response = await axios.post('http://localhost:3000/auth/login', {
+        const response = await axios.post(`${API_URL}/auth/login`, {
             email: email,
             password: password
         });
@@ -46,10 +50,10 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Obtener todas las tareas
+// Obtener todas las tareas del usuario
 app.get('/tasks', async (req, res) => {
     try {
-        const response = await axios.get('http://localhost:3000/tasks');
+        const response = await axios.get(`http://localhost:3000/tasks/home/${session_id}`);
         res.render('index.html', { tasks: response.data });
     } catch (error) {
         res.status(500).send('Error al obtener las tareas');

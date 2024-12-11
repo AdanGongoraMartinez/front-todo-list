@@ -40,7 +40,7 @@ app.post('/login', async (req, res) => {
         });
 
         if (response.data.success) {
-            session_id = response.data.user_id;
+            session_id = response.data.id;
             res.redirect('/tasks');
         } else {
             res.render('login.html', { error: 'Invalid credentials, try again.' });
@@ -53,7 +53,7 @@ app.post('/login', async (req, res) => {
 // Obtener todas las tareas del usuario
 app.get('/tasks', async (req, res) => {
     try {
-        const response = await axios.get(`http://localhost:3000/tasks/home/${session_id}`);
+        const response = await axios.get(`${API_URL}/tasks/home/${session_id}`);
         res.render('index.html', { tasks: response.data });
     } catch (error) {
         res.status(500).send('Error al obtener las tareas');
@@ -65,7 +65,7 @@ app.post('/tasks', async (req, res) => {
     try {
         const task = { user_id: session_id, title: req.body.title };
         console.log(task);
-        await axios.post('http://localhost:3000/tasks/create', task);
+        await axios.post(`${API_URL}/tasks/create`, task);
         res.redirect('/tasks');
     } catch (error) {
         res.status(500).send('Error al crear la tarea');
@@ -76,10 +76,8 @@ app.post('/tasks', async (req, res) => {
 app.post('/tasks/:id/toggle', async (req, res) => {
     try {
         const taskId = req.params.id;
-        const task = await axios.get(`http://localhost:3000/tasks/${taskId}`);
-        await axios.post(`http://localhost:3000/tasks/update/${taskId}`, {
-            completed: !task.data[0].completed
-        });
+        const task = await axios.get(`${API_URL}/tasks/${taskId}`);
+        await axios.post(`${API_URL}/tasks/update/${taskId}`);
         res.redirect('/tasks');
     } catch (error) {
         res.status(500).send('Error al actualizar la tarea');
@@ -90,7 +88,7 @@ app.post('/tasks/:id/toggle', async (req, res) => {
 app.post('/tasks/:id/delete', async (req, res) => {
     try {
         const taskId = req.params.id;
-        const task = await axios.post(`http://localhost:3000/tasks/delete/${taskId}`);
+        const task = await axios.post(`${API_URL}/tasks/delete/${taskId}`);
         res.redirect('/tasks');
     } catch (error) {
         res.status(500).send('Error al borrar la tarea');

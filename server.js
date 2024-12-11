@@ -64,7 +64,7 @@ app.get('/tasks', async (req, res) => {
 app.post('/tasks', async (req, res) => {
     try {
         const task = { user_id: session_id, title: req.body.title };
-        console.log(task);
+        // console.log(task);
         await axios.post(`${API_URL}/tasks/create`, task);
         res.redirect('/tasks');
     } catch (error) {
@@ -76,7 +76,6 @@ app.post('/tasks', async (req, res) => {
 app.post('/tasks/:id/toggle', async (req, res) => {
     try {
         const taskId = req.params.id;
-        const task = await axios.get(`${API_URL}/tasks/${taskId}`);
         await axios.post(`${API_URL}/tasks/update/${taskId}`);
         res.redirect('/tasks');
     } catch (error) {
